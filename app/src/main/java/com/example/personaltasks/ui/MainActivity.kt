@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.personaltasks.R
@@ -12,7 +13,7 @@ import com.example.personaltasks.databinding.ActivityMainBinding
 import com.example.personaltasks.model.Task
 import java.time.LocalDate
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -75,4 +76,29 @@ class MainActivity : AppCompatActivity() {
         }
         taskAdapter.notifyDataSetChanged()
     }
+
+    override fun onViewTask(position: Int) {
+        val viewIntent = Intent(this, TasksActivity::class.java).apply {
+            putExtra(EXTRA_TASK, tasks[position])
+            putExtra(EXTRA_VIEW_MODE, true)
+        }
+        startActivity(viewIntent)
+    }
+
+    override fun onEditTask(position: Int) {
+        val editIntent = Intent(this, TasksActivity::class.java).apply {
+            putExtra(EXTRA_TASK, tasks[position])
+        }
+        editTaskLauncher.launch(editIntent)
+    }
+
+    override fun onRemoveTask(position: Int) {
+        val taskToRemove = tasks[position]
+        taskController.removeTask(taskToRemove)
+        tasks.removeAt(position)
+        taskAdapter.notifyItemRemoved(position)
+    }
+
+
+
 }
