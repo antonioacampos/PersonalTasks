@@ -1,10 +1,12 @@
 package com.example.personaltasks.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.personaltasks.R
@@ -25,6 +27,30 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+
+    private val createTaskArl = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            data?.let {
+                val task = it.getParcelableExtra<Task>(EXTRA_TASK)
+                val position = it.getIntExtra("TASK_POSITION", -1)
+                if (task != null) {
+                    if (position >= 0) {
+                        tasks[position] = task
+                        taskAdapter.notifyItemChanged(position)
+                        Toast.makeText(this, "Tarefa atualizada", Toast.LENGTH_SHORT).show()
+                    } else {
+                        tasks.add(task)
+                        taskAdapter.notifyItemInserted(tasks.lastIndex)
+                        Toast.makeText(this, "Tarefa adicionada", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
 
     private val tasks = mutableListOf<Task>()
     private val taskAdapter: TaskListAdapter by lazy {
@@ -85,18 +111,18 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     override fun onViewTask(position: Int) {
-        val viewIntent = Intent(this, TasksActivity::class.java).apply {
+        Intent(this, TasksActivity::class.java).apply {
             putExtra(EXTRA_TASK, tasks[position])
             putExtra(EXTRA_VIEW_MODE, true)
+            startActivity(this)
         }
-        startActivity(viewIntent)
     }
 
     override fun onEditTask(position: Int) {
-        val editIntent = Intent(this, TasksActivity::class.java).apply {
+        Intent(this, TasksActivity::class.java).apply {
             putExtra(EXTRA_TASK, tasks[position])
+            createTaskArl.launch(this)
         }
-        editTaskLauncher.launch(editIntent)
     }
 
     override fun onRemoveTask(position: Int) {
@@ -105,7 +131,4 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         tasks.removeAt(position)
         taskAdapter.notifyItemRemoved(position)
     }
-
-
-
 }
