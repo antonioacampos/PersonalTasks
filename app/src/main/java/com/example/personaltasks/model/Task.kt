@@ -1,7 +1,10 @@
 package com.example.personaltasks.model
 
 import java.time.LocalDate
+import kotlinx.parcelize.Parcelize
+import android.os.Parcelable
 
-class Task(var title: String, var description: String, var dueDate: LocalDate) {
+@Parcelize
+class Task(var title: String, var description: String, var dueDate: LocalDate) : Parcelable{
 
 }

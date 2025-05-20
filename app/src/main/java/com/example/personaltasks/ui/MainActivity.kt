@@ -21,7 +21,7 @@ import java.time.LocalDate
 class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
     private val taskController: TaskController by lazy {
-        TaskController(this)
+        TaskController()
     }
 
     private val binding: ActivityMainBinding by lazy {
