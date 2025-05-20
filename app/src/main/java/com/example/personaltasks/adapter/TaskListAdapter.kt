@@ -2,14 +2,18 @@ package com.example.personaltasks.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.personaltasks.R
 import com.example.personaltasks.databinding.TaskDetailBinding
 import com.example.personaltasks.model.Task
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import com.example.personaltasks.ui.OnTaskClickListener
 
 class TaskListAdapter(
-    private val tasks: List<Task>
+    private val tasks: List<Task>,
+    private val onTaskClickListener: OnTaskClickListener
 ) : RecyclerView.Adapter<TaskListAdapter.TaskViewHolder>() {
 
     inner class TaskViewHolder(private val binding: TaskDetailBinding) :
@@ -22,6 +26,29 @@ class TaskListAdapter(
                 dueDateTv.text = task.dueDate.format(
                     DateTimeFormatter.ofLocalizedDate
                     (FormatStyle.MEDIUM))
+            }
+        }
+        init {
+            binding.root.setOnCreateContextMenuListener { menu, v, menuInfo ->
+                (onTaskClickListener as AppCompatActivity).menuInflater.inflate(
+                    R.menu.menu_task_options,
+                    menu
+                )
+
+                menu.findItem(R.id.menu_view_task).setOnMenuItemClickListener {
+                    onTaskClickListener.onViewTask(adapterPosition)
+                    true
+                }
+
+                menu.findItem(R.id.menu_edit_task).setOnMenuItemClickListener {
+                    onTaskClickListener.onEditTask(adapterPosition)
+                    true
+                }
+
+                menu.findItem(R.id.menu_remove_task).setOnMenuItemClickListener {
+                    onTaskClickListener.onRemoveTask(adapterPosition)
+                    true
+                }
             }
         }
     }
