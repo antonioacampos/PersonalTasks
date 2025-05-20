@@ -9,11 +9,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.personaltasks.R
 import com.example.personaltasks.adapter.TaskListAdapter
+import com.example.personaltasks.controllers.TaskController
 import com.example.personaltasks.databinding.ActivityMainBinding
 import com.example.personaltasks.model.Task
+import com.example.personaltasks.ui.Extras.EXTRA_TASK
+import com.example.personaltasks.ui.Extras.EXTRA_VIEW_MODE
 import java.time.LocalDate
 
 class MainActivity : AppCompatActivity(), OnTaskClickListener {
+
+    private val taskController: TaskController by lazy {
+        TaskController(this)
+    }
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
