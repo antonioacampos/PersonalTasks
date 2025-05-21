@@ -2,6 +2,7 @@ package com.example.personaltasks.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -34,27 +35,32 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         if (result.resultCode == Activity.RESULT_OK) {
             val data = result.data
             data?.let {
-                val task = it.getParcelableExtra<Task>(EXTRA_TASK)
+                val task = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    it.getParcelableExtra(EXTRA_TASK, Task::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    it.getParcelableExtra(EXTRA_TASK)
+                }
                 val position = it.getIntExtra("TASK_POSITION", -1)
-                if (task != null) {
+
+                task?.let { receivedTask ->
                     if (position >= 0) {
-                        tasks[position] = task
+                        tasks[position] = receivedTask
                         taskAdapter.notifyItemChanged(position)
-                        Toast.makeText(this, "Tarefa atualizada", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Tarefa atualizada!", Toast.LENGTH_SHORT).show()
                     } else {
-                        tasks.add(task)
+                        tasks.add(receivedTask)
                         taskAdapter.notifyItemInserted(tasks.lastIndex)
-                        Toast.makeText(this, "Tarefa adicionada", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Tarefa adicionada!", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
     }
 
-
     private val tasks = mutableListOf<Task>()
     private val taskAdapter: TaskListAdapter by lazy {
-        TaskListAdapter(tasks)
+        TaskListAdapter(tasks, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,16 +90,12 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.add_contact_mi -> {
-                navigateToTaskCreation()
+            R.id.add_task_mi -> { // Alterado para add_task_mi
+                createTaskArl.launch(Intent(this, TasksActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun navigateToTaskCreation() {
-        startActivity(Intent(this, TasksActivity::class.java))
     }
 
     private fun loadSampleTasks() {
@@ -121,6 +123,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     override fun onEditTask(position: Int) {
         Intent(this, TasksActivity::class.java).apply {
             putExtra(EXTRA_TASK, tasks[position])
+            putExtra("TASK_POSITION", position)
             createTaskArl.launch(this)
         }
     }
@@ -130,5 +133,10 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         taskController.removeTask(taskToRemove)
         tasks.removeAt(position)
         taskAdapter.notifyItemRemoved(position)
+        Toast.makeText(this, "Tarefa removida!", Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        const val EDIT_TASK_REQUEST_CODE = 1
     }
 }
