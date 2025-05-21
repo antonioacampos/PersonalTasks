@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.personaltasks.R
 import com.example.personaltasks.adapter.TaskListAdapter
@@ -17,12 +18,13 @@ import com.example.personaltasks.databinding.ActivityMainBinding
 import com.example.personaltasks.model.Task
 import com.example.personaltasks.ui.Extras.EXTRA_TASK
 import com.example.personaltasks.ui.Extras.EXTRA_VIEW_MODE
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
     private val taskController: TaskController by lazy {
-        TaskController()
+        TaskController.getInstance(this)
     }
 
     private val binding: ActivityMainBinding by lazy {
@@ -33,25 +35,24 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data
-            data?.let {
-                val task = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    it.getParcelableExtra(EXTRA_TASK, Task::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    it.getParcelableExtra(EXTRA_TASK)
-                }
-                val position = it.getIntExtra("TASK_POSITION", -1)
-
-                task?.let { receivedTask ->
-                    if (position >= 0) {
-                        tasks[position] = receivedTask
-                        taskAdapter.notifyItemChanged(position)
-                        Toast.makeText(this, "Tarefa atualizada!", Toast.LENGTH_SHORT).show()
+            result.data?.let { data ->
+                lifecycleScope.launch {
+                    val task = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        data.getParcelableExtra(EXTRA_TASK, Task::class.java)
                     } else {
-                        tasks.add(receivedTask)
-                        taskAdapter.notifyItemInserted(tasks.lastIndex)
-                        Toast.makeText(this, "Tarefa adicionada!", Toast.LENGTH_SHORT).show()
+                        @Suppress("DEPRECATION")
+                        data.getParcelableExtra(EXTRA_TASK)
+                    }
+                    val position = data.getIntExtra("TASK_POSITION", -1)
+
+                    task?.let { receivedTask ->
+                        if (position >= 0) {
+                            taskController.updateTask(receivedTask)
+                            updateTaskInList(receivedTask, position)
+                        } else {
+                            taskController.createTask(receivedTask)
+                            addTaskToList(receivedTask)
+                        }
                     }
                 }
             }
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupUi()
-        loadSampleTasks()
+        loadTasksFromDatabase()
     }
 
     private fun setupUi() {
@@ -90,7 +91,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.add_task_mi -> { // Alterado para add_task_mi
+            R.id.add_task_mi -> {
                 createTaskArl.launch(Intent(this, TasksActivity::class.java))
                 true
             }
@@ -98,18 +99,13 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
     }
 
-    private fun loadSampleTasks() {
-        tasks.clear()
-        (0..20).forEach { index ->
-            tasks.add(
-                Task(
-                    title = "Task $index",
-                    description = "Description $index",
-                    dueDate = LocalDate.now().plusDays(index.toLong())
-                )
-            )
+    private fun loadTasksFromDatabase() {
+        lifecycleScope.launch {
+            val databaseTasks = taskController.getAllTasks()
+            tasks.clear()
+            tasks.addAll(databaseTasks)
+            taskAdapter.notifyDataSetChanged()
         }
-        taskAdapter.notifyDataSetChanged()
     }
 
     override fun onViewTask(position: Int) {
@@ -129,11 +125,35 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     override fun onRemoveTask(position: Int) {
-        val taskToRemove = tasks[position]
-        taskController.removeTask(taskToRemove)
-        tasks.removeAt(position)
-        taskAdapter.notifyItemRemoved(position)
-        Toast.makeText(this, "Tarefa removida!", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            val taskToRemove = tasks[position]
+            taskController.removeTask(taskToRemove)
+            tasks.removeAt(position)
+            runOnUiThread {
+                taskAdapter.notifyItemRemoved(position)
+                Toast.makeText(
+                    this@MainActivity,
+                    "${taskToRemove.title} removida!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun updateTaskInList(task: Task, position: Int) {
+        tasks[position] = task
+        runOnUiThread {
+            taskAdapter.notifyItemChanged(position)
+            Toast.makeText(this, "Tarefa atualizada!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun addTaskToList(task: Task) {
+        tasks.add(task)
+        runOnUiThread {
+            taskAdapter.notifyItemInserted(tasks.lastIndex)
+            Toast.makeText(this, "Tarefa adicionada!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     companion object {
