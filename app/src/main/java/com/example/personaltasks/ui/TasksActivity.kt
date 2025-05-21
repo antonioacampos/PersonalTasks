@@ -21,6 +21,7 @@ class TasksActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar.toolbar)
+        supportActionBar?.subtitle = "Nova tarefa"
 
         val task = retrieveTaskFromIntent()
 
