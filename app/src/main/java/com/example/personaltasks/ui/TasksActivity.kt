@@ -1,13 +1,15 @@
 package com.example.personaltasks.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.personaltasks.databinding.ActivityTaskBinding
-import com.example.personaltasks.ui.Extras.EXTRA_TASK
 import com.example.personaltasks.model.Task
+import com.example.personaltasks.ui.Extras.EXTRA_TASK
+import com.example.personaltasks.ui.Extras.EXTRA_VIEW_MODE
 import java.time.LocalDate
 
 class TasksActivity : AppCompatActivity() {
@@ -16,17 +18,33 @@ class TasksActivity : AppCompatActivity() {
         ActivityTaskBinding.inflate(layoutInflater)
     }
 
+    private var isEditMode = false
+    private var originalTask: Task? = null
+    private var taskPosition = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        setupToolbar()
+        handleIntent()
+    }
+
+    private fun setupToolbar() {
         setSupportActionBar(binding.toolbar.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.subtitle = "Nova tarefa"
+    }
 
-        val task = retrieveTaskFromIntent()
+    private fun handleIntent() {
+        originalTask = retrieveTaskFromIntent()
+        taskPosition = intent.getIntExtra("TASK_POSITION", -1)
 
-        if (task != null) {
-            showTaskDetails(task)
+        originalTask?.let {
+            isEditMode = true
+            showTaskDetails(it)
+        } ?: run {
+            setupNewTask()
         }
     }
 
@@ -35,39 +53,95 @@ class TasksActivity : AppCompatActivity() {
             intent.getParcelableExtra(EXTRA_TASK, Task::class.java)
         } else {
             @Suppress("DEPRECATION")
-            intent.getParcelableExtra<Task>(EXTRA_TASK)
+            intent.getParcelableExtra(EXTRA_TASK)
         }
     }
 
     private fun showTaskDetails(task: Task) {
-        supportActionBar?.subtitle = "Detalhes da tarefa"
+        supportActionBar?.subtitle = if (isEditMode) "Editando tarefa" else "Detalhes da tarefa"
+
         with(binding) {
             titleEt.setText(task.title)
             descriptionEt.setText(task.description)
             dueDateDp.updateDate(task.dueDate.year, task.dueDate.monthValue - 1, task.dueDate.dayOfMonth)
 
-            listOf(titleEt, descriptionEt, dueDateDp).forEach { it.isEnabled = false }
-            saveBt.visibility = View.GONE
+            val isViewMode = intent.getBooleanExtra(EXTRA_VIEW_MODE, false)
+            listOf(titleEt, descriptionEt, dueDateDp).forEach { it.isEnabled = !isViewMode }
+            saveBt.visibility = if (isViewMode) View.GONE else View.VISIBLE
         }
 
-        with(binding){
-            saveBt.setOnClickListener {
-                Task(
-                    hashCode(),
-                    titleEt.text.toString(),
-                    descriptionEt.text.toString(),
-                    LocalDate.of(dueDateDp.year, dueDateDp.month, dueDateDp.dayOfMonth)
-                ).let { contact ->
-                    Intent().apply{
-                        putExtra(EXTRA_TASK, contact)
-                        setResult(RESULT_OK, this)
-                    }
-                }
-                finish()
-            }
+        setupButtons()
+    }
+
+    private fun setupNewTask() {
+        supportActionBar?.subtitle = "Nova tarefa"
+        binding.saveBt.visibility = View.VISIBLE
+        setupButtons()
+    }
+
+    private fun setupButtons() {
+        binding.saveBt.setOnClickListener {
+            handleSaveAction()
         }
+
         binding.cancelBt.setOnClickListener {
+            setResult(Activity.RESULT_CANCELED)
             finish()
         }
+    }
+
+    private fun handleSaveAction() {
+        val newTask = createTaskFromInputs()
+
+        if (validateTask(newTask)) {
+            returnResult(newTask)
+        } else {
+            showValidationError()
+        }
+    }
+
+    private fun createTaskFromInputs(): Task {
+        return originalTask?.copy(
+            title = binding.titleEt.text.toString(),
+            description = binding.descriptionEt.text.toString(),
+            dueDate = LocalDate.of(
+                binding.dueDateDp.year,
+                binding.dueDateDp.month + 1,
+                binding.dueDateDp.dayOfMonth
+            )
+        ) ?: Task(
+            id = 0,
+            title = binding.titleEt.text.toString(),
+            description = binding.descriptionEt.text.toString(),
+            dueDate = LocalDate.of(
+                binding.dueDateDp.year,
+                binding.dueDateDp.month + 1,
+                binding.dueDateDp.dayOfMonth
+            )
+        )
+    }
+
+    private fun validateTask(task: Task): Boolean {
+        return task.title.isNotBlank() && task.description.isNotBlank()
+    }
+
+    private fun showValidationError() {
+    }
+
+    private fun returnResult(task: Task) {
+        Intent().apply {
+            putExtra(EXTRA_TASK, task)
+            if (isEditMode) {
+                putExtra("TASK_POSITION", taskPosition)
+            }
+            setResult(RESULT_OK, this)
+        }
+        finish()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        setResult(RESULT_CANCELED)
+        finish()
+        return true
     }
 }
