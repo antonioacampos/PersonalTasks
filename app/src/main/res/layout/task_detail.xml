@@ -25,11 +25,4 @@
         android:id="@+id/due_date_tv"
         android:text="@string/due_date"
         android:layout_marginTop="8dp"/>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/submit_btn"
-        android:text="Enviar"
-        android:layout_marginTop="16dp"/>
 </LinearLayout>
