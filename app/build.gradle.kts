@@ -1,8 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
-    alias(libs.plugins.ksp)
+    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+    id("org.jetbrains.kotlin.android") version "1.9.22"
+
 }
 
 android {
@@ -50,7 +51,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
+
 }
