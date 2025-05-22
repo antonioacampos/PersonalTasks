@@ -19,6 +19,7 @@ import com.example.personaltasks.model.Task
 import com.example.personaltasks.ui.Extras.EXTRA_TASK
 import com.example.personaltasks.ui.Extras.EXTRA_VIEW_MODE
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 class MainActivity : AppCompatActivity(), OnTaskClickListener {
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                             taskController.createTask(receivedTask)
                             addTaskToList(receivedTask)
                         }
+                        loadTasksFromDatabase()
                     }
                 }
             }
