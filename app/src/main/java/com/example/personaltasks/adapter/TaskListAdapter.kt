@@ -24,10 +24,15 @@ class TaskListAdapter(
                 titleTv.text = task.title
                 descriptionTv.text = task.description
                 dueDateTv.text = task.dueDate.format(
-                    DateTimeFormatter.ofLocalizedDate
-                    (FormatStyle.MEDIUM))
+                    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+                )
+
+                root.setOnClickListener {
+                    onTaskClickListener.onViewTask(adapterPosition)
+                }
             }
         }
+
         init {
             binding.root.setOnCreateContextMenuListener { menu, v, menuInfo ->
                 (onTaskClickListener as AppCompatActivity).menuInflater.inflate(
