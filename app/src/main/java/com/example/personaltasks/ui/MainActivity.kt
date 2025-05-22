@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                 taskAdapter.notifyItemRemoved(position)
                 Toast.makeText(
                     this@MainActivity,
-                    "${taskToRemove.title} removida!",
+                    "${taskToRemove.title} removed!",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         tasks[position] = task
         runOnUiThread {
             taskAdapter.notifyItemChanged(position)
-            Toast.makeText(this, "Tarefa atualizada!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Task updated!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         tasks.add(task)
         runOnUiThread {
             taskAdapter.notifyItemInserted(tasks.lastIndex)
-            Toast.makeText(this, "Tarefa adicionada!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Task added!", Toast.LENGTH_SHORT).show()
         }
     }
 

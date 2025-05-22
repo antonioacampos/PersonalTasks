@@ -33,7 +33,7 @@ class TasksActivity : AppCompatActivity() {
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbar.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.subtitle = "Nova tarefa"
+        supportActionBar?.subtitle = "New task"
     }
 
     private fun handleIntent() {
@@ -58,7 +58,7 @@ class TasksActivity : AppCompatActivity() {
     }
 
     private fun showTaskDetails(task: Task) {
-        supportActionBar?.subtitle = if (isEditMode) "Editando tarefa" else "Detalhes da tarefa"
+        supportActionBar?.subtitle = if (isEditMode) "Updating task" else "Task details"
 
         with(binding) {
             titleEt.setText(task.title)
@@ -74,7 +74,7 @@ class TasksActivity : AppCompatActivity() {
     }
 
     private fun setupNewTask() {
-        supportActionBar?.subtitle = "Nova tarefa"
+        supportActionBar?.subtitle = "New task"
         binding.saveBt.visibility = View.VISIBLE
         setupButtons()
     }
