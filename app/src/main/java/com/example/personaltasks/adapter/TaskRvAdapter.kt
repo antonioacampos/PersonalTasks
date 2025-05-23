@@ -11,10 +11,10 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import com.example.personaltasks.ui.OnTaskClickListener
 
-class TaskListAdapter(
+class TaskRvAdapter(
     private val tasks: List<Task>,
     private val onTaskClickListener: OnTaskClickListener
-) : RecyclerView.Adapter<TaskListAdapter.TaskViewHolder>() {
+) : RecyclerView.Adapter<TaskRvAdapter.TaskViewHolder>() {
 
     inner class TaskViewHolder(private val binding: TaskDetailBinding) :
         RecyclerView.ViewHolder(binding.root) {
