@@ -12,7 +12,7 @@ o app possui duas principais áreas de navegação:
 - Toque e segure em uma tarefa para exibir as ações possíveis como visualizar, editar ou excluir
 - No topo, use o botão de adicionar para criar uma nova tarefa
 
-### 2. Detalhamento e Edição
+### 2. Detalhamento e
 
 - Ao criar, visualizar ou editar, você acessa um formulário dedicado
 - Preencha ou altere título, descrição e data limite
