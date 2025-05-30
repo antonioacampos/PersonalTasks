@@ -3,6 +3,7 @@ package com.example.personaltasks.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.personaltasks.R
 import com.example.personaltasks.databinding.TaskDetailBinding
@@ -26,7 +27,15 @@ class TaskRvAdapter(
                 dueDateTv.text = task.dueDate.format(
                     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                 )
+                val textColor = if (task.isCompleted) {
+                    ContextCompat.getColor(root.context, R.color.completed_task_text)
+                } else {
+                    ContextCompat.getColor(root.context, R.color.black)
+                }
+                titleTv.setTextColor(textColor)
+                descriptionTv.setTextColor(textColor)
 
+                dueDateTv.setTextColor(textColor)
                 root.setOnClickListener {
                     onTaskClickListener.onViewTask(adapterPosition)
                 }

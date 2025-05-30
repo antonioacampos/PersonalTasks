@@ -7,6 +7,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Parcelize @Entity
-data class Task(@PrimaryKey(autoGenerate = true) var id: Int, var title: String, var description: String, var dueDate: LocalDate) : Parcelable{
+data class Task(@PrimaryKey(autoGenerate = true) var id: Int, var title: String, var description: String, var dueDate: LocalDate, var isCompleted : Boolean = false) : Parcelable{
 
 }

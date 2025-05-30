@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.personaltasks.R
-import com.example.personaltasks.adapter.TaskListAdapter
+import com.example.personaltasks.adapter.TaskRvAdapter
 import com.example.personaltasks.controllers.TaskController
 import com.example.personaltasks.databinding.ActivityMainBinding
 import com.example.personaltasks.model.Task
@@ -62,8 +62,8 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     private val tasks = mutableListOf<Task>()
-    private val taskAdapter: TaskListAdapter by lazy {
-        TaskListAdapter(tasks, this)
+    private val taskAdapter: TaskRvAdapter by lazy {
+        TaskRvAdapter(tasks, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

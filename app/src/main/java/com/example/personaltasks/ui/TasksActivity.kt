@@ -108,7 +108,8 @@ class TasksActivity : AppCompatActivity() {
                 binding.dueDateDp.year,
                 binding.dueDateDp.month + 1,
                 binding.dueDateDp.dayOfMonth
-            )
+            ),
+            isCompleted = binding.completionCb.isChecked
         ) ?: Task(
             id = 0,
             title = binding.titleEt.text.toString(),
@@ -117,7 +118,8 @@ class TasksActivity : AppCompatActivity() {
                 binding.dueDateDp.year,
                 binding.dueDateDp.month + 1,
                 binding.dueDateDp.dayOfMonth
-            )
+            ),
+            isCompleted = false
         )
     }
 

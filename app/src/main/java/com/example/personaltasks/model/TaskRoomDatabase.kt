@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [Task::class], version = 1)
+@Database(entities = [Task::class], version = 2)
 @TypeConverters(LocalDateConverter::class)
 abstract class TaskRoomDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDAO
@@ -21,7 +21,7 @@ abstract class TaskRoomDatabase : RoomDatabase() {
                     context.applicationContext,
                     TaskRoomDatabase::class.java,
                     "task_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance
             }
