@@ -3,7 +3,7 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.devtools.ksp") version "1.9.22-1.0.17"
     id("org.jetbrains.kotlin.android") version "1.9.22"
-
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -48,11 +48,14 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
-
+    implementation(project.dependencies.platform("com.google.firebase:firebase-bom:33.15.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
 }
