@@ -90,4 +90,21 @@ class FirebaseTaskService {
                 onComplete(false, exception.message)
             }
     }
+
+    fun reactivateTask(firebaseId: String, onComplete: (Boolean, String?) -> Unit) {
+        val updates = mapOf(
+            "isDeleted" to false,
+            "deletedAt" to 0L
+        )
+
+        db.collection("tasks")
+            .document(firebaseId)
+            .update(updates)
+            .addOnSuccessListener {
+                onComplete(true, null)
+            }
+            .addOnFailureListener { exception ->
+                onComplete(false, exception.message)
+            }
+    }
 }
