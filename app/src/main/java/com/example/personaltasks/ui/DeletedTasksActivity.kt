@@ -41,4 +41,12 @@ class DeletedTasksActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
     }
+
+    private fun loadDeletedTasks() {
+        lifecycleScope.launch {
+            val deletedTasks = taskController.getDeletedTasks()
+            adapter.updateTasks(deletedTasks)
+        }
+    }
+
 }
