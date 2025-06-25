@@ -105,6 +105,12 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                 createTaskArl.launch(Intent(this, TasksActivity::class.java))
                 true
             }
+            R.id.action_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                startActivity(Intent(this, AuthenticationActivity::class.java))
+                finish()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
