@@ -10,4 +10,29 @@ class FirebaseTaskService {
     private fun getCurrentUserId(): String {
         return auth.currentUser?.uid ?: ""
     }
+
+    fun saveTask(task: Task, onComplete: (Boolean, String?) -> Unit) {
+        val taskWithUserId = task.copy(userId = getCurrentUserId())
+
+        if (task.firebaseId.isEmpty()) {
+            db.collection("tasks")
+                .add(taskWithUserId)
+                .addOnSuccessListener { documentReference ->
+                    onComplete(true, documentReference.id)
+                }
+                .addOnFailureListener { exception ->
+                    onComplete(false, exception.message)
+                }
+        } else {
+            db.collection("tasks")
+                .document(task.firebaseId)
+                .set(taskWithUserId)
+                .addOnSuccessListener {
+                    onComplete(true, null)
+                }
+                .addOnFailureListener { exception ->
+                    onComplete(false, exception.message)
+                }
+        }
+    }
 }
