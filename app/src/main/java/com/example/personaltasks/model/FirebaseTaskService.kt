@@ -107,4 +107,21 @@ class FirebaseTaskService {
                 onComplete(false, exception.message)
             }
     }
+
+    fun getTaskById(firebaseId: String, onComplete: (Task?) -> Unit) {
+        db.collection("tasks")
+            .document(firebaseId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val task = document.toObject(Task::class.java)?.copy(firebaseId = document.id)
+                    onComplete(task)
+                } else {
+                    onComplete(null)
+                }
+            }
+            .addOnFailureListener {
+                onComplete(null)
+            }
+    }
 }
