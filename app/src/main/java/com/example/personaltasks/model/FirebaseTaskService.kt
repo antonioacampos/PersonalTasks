@@ -73,4 +73,21 @@ class FirebaseTaskService {
                 onComplete(tasks)
             }
     }
+
+    fun deleteTask(firebaseId: String, onComplete: (Boolean, String?) -> Unit) {
+        val updates = mapOf(
+            "isDeleted" to true,
+            "deletedAt" to System.currentTimeMillis()
+        )
+
+        db.collection("tasks")
+            .document(firebaseId)
+            .update(updates)
+            .addOnSuccessListener {
+                onComplete(true, null)
+            }
+            .addOnFailureListener { exception ->
+                onComplete(false, exception.message)
+            }
+    }
 }
