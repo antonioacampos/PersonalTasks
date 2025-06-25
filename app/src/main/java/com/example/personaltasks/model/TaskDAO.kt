@@ -16,8 +16,11 @@ interface TaskDAO {
     @Query("SELECT * FROM Task WHERE id = :id")
     suspend fun getById(id: Long): Task?
 
-    @Query("SELECT * FROM Task ORDER BY dueDate ASC")
+    @Query("SELECT * FROM Task WHERE isDeleted = 0 ORDER BY dueDate ASC")
     suspend fun getAll(): List<Task>
+
+    @Query("SELECT * FROM Task WHERE isDeleted = 1")
+    suspend fun getDeletedTasks(): List<Task>
 
     @Update
     suspend fun update(task: Task): Int
