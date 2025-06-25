@@ -22,4 +22,12 @@ class AuthenticationActivity : AppCompatActivity() {
         initViews()
         setupClickListeners()
     }
+
+    private fun initViews() {
+        emailEditText = findViewById(R.id.emailEditText)
+        passwordEditText = findViewById(R.id.passwordEditText)
+        loginButton = findViewById(R.id.loginButton)
+        registerButton = findViewById(R.id.registerButton)
+    }
+
 }
