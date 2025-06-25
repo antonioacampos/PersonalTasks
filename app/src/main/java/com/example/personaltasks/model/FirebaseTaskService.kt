@@ -124,4 +124,16 @@ class FirebaseTaskService {
                 onComplete(null)
             }
     }
+
+    fun permanentlyDeleteTask(firebaseId: String, onComplete: (Boolean, String?) -> Unit) {
+        db.collection("tasks")
+            .document(firebaseId)
+            .delete()
+            .addOnSuccessListener {
+                onComplete(true, null)
+            }
+            .addOnFailureListener { exception ->
+                onComplete(false, exception.message)
+            }
+    }
 }
