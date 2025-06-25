@@ -16,6 +16,9 @@
             android:name=".ui.TasksActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.AuthenticationActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
