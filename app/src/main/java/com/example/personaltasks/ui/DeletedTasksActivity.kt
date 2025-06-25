@@ -29,4 +29,16 @@ class DeletedTasksActivity : AppCompatActivity() {
         setupRecyclerView()
         loadDeletedTasks()
     }
+
+    private fun setupRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerViewDeletedTasks)
+        adapter = DeletedTasksAdapter(mutableListOf()) { task, position ->
+            selectedTask = task
+            selectedPosition = position
+            registerForContextMenu(recyclerView)
+        }
+
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+    }
 }
