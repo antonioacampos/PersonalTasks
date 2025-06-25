@@ -69,6 +69,14 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser == null) {
+            startActivity(Intent(this, AuthenticationActivity::class.java))
+            finish()
+            return
+        }
+
         setupUi()
         loadTasksFromDatabase()
     }
