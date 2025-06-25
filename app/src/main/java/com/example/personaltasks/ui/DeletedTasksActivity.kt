@@ -69,4 +69,15 @@ class DeletedTasksActivity : AppCompatActivity() {
         return super.onContextItemSelected(item)
     }
 
+
+    private fun reactivateTask(task: Task) {
+        firebaseService.reactivateTask(task.firebaseId) { success, error ->
+            if (success) {
+                Toast.makeText(this, "Tarefa reativada com sucesso", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Erro ao reativar tarefa: $error", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 }
