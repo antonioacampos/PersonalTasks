@@ -35,4 +35,22 @@ class FirebaseTaskService {
                 }
         }
     }
+
+    fun getActiveTasks(onComplete: (List<Task>) -> Unit) {
+        db.collection("tasks")
+            .whereEqualTo("userId", getCurrentUserId())
+            .whereEqualTo("isDeleted", false)
+            .addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
+                    onComplete(emptyList())
+                    return@addSnapshotListener
+                }
+
+                val tasks = snapshot?.documents?.mapNotNull { document ->
+                    document.toObject(Task::class.java)?.copy(firebaseId = document.id)
+                } ?: emptyList()
+
+                onComplete(tasks)
+            }
+    }
 }
