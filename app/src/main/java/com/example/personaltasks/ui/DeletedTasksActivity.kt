@@ -49,4 +49,24 @@ class DeletedTasksActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        selectedTask?.let { task ->
+            when (item.itemId) {
+                1 -> {
+                    reactivateTask(task)
+                    return true
+                }
+                2 -> {
+                    showTaskDetails(task)
+                    return true
+                }
+                else -> {
+                    return super.onContextItemSelected(item)
+                }
+            }
+        }
+        return super.onContextItemSelected(item)
+    }
+
 }
