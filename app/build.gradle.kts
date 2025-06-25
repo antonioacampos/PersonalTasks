@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     id("kotlin-parcelize")
-    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
-    id("org.jetbrains.kotlin.android") version "1.9.22"
+    id("com.google.devtools.ksp") version "2.0.0-1.0.21"
+    id("org.jetbrains.kotlin.android") version "2.0.0"
     id("com.google.gms.google-services")
 }
 
@@ -49,6 +49,9 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
