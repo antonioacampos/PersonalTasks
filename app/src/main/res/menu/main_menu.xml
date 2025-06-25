@@ -5,4 +5,8 @@
         android:title="@string/new_task"
         app:showAsAction="always"
         android:icon="@drawable/ic_new"/>
+    <item
+        android:id="@+id/action_logout"
+        android:title="Sair"
+        android:showAsAction="never"/>
 </menu>
