@@ -18,4 +18,15 @@ class DeletedTasksActivity : AppCompatActivity() {
     private val taskController: TaskController by lazy {
         TaskController.getInstance(this)
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_deleted_tasks)
+        supportActionBar?.title = "Tarefas Excluídas"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        firebaseService = FirebaseTaskService()
+        setupRecyclerView()
+        loadDeletedTasks()
+    }
 }
