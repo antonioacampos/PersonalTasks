@@ -2,6 +2,7 @@ package com.example.personaltasks.model
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class FirebaseTaskService {
     private val db = FirebaseFirestore.getInstance()
@@ -40,6 +41,25 @@ class FirebaseTaskService {
         db.collection("tasks")
             .whereEqualTo("userId", getCurrentUserId())
             .whereEqualTo("isDeleted", false)
+            .addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
+                    onComplete(emptyList())
+                    return@addSnapshotListener
+                }
+
+                val tasks = snapshot?.documents?.mapNotNull { document ->
+                    document.toObject(Task::class.java)?.copy(firebaseId = document.id)
+                } ?: emptyList()
+
+                onComplete(tasks)
+            }
+    }
+
+    fun getDeletedTasks(onComplete: (List<Task>) -> Unit) {
+        db.collection("tasks")
+            .whereEqualTo("userId", getCurrentUserId())
+            .whereEqualTo("isDeleted", true)
+            .orderBy("deletedAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, exception ->
                 if (exception != null) {
                     onComplete(emptyList())
