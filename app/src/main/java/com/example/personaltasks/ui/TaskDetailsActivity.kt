@@ -51,4 +51,10 @@ class TaskDetailsActivity : AppCompatActivity() {
         }
     }
 
+    private fun displayTaskDetails(task: Task) {
+        titleTextView.text = task.title
+        descriptionTextView.text = task.description
+        dueDateTextView.text = "Prazo: ${task.dueDate}"
+    }
+
 }
