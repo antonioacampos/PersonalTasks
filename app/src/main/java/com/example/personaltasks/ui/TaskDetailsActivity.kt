@@ -57,4 +57,13 @@ class TaskDetailsActivity : AppCompatActivity() {
         dueDateTextView.text = "Prazo: ${task.dueDate}"
     }
 
+    private fun displayTaskFromIntent() {
+        val title = intent.getStringExtra("task_title") ?: ""
+        val description = intent.getStringExtra("task_description") ?: ""
+        val dueDate = intent.getStringExtra("task_due_date") ?: ""
+
+        titleTextView.text = title
+        descriptionTextView.text = description
+        dueDateTextView.text = "Prazo: $dueDate"
+    }
 }
