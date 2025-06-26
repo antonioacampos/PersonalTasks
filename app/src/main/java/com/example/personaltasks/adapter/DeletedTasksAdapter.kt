@@ -10,4 +10,10 @@ class DeletedTasksAdapter(
         val descriptionTextView: TextView = view.findViewById(R.id.descriptionTextView)
         val dueDateTextView: TextView = view.findViewById(R.id.dueDateTextView)
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_deleted_task, parent, false)
+        return ViewHolder(view)
+    }
 }
