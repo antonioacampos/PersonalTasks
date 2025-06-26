@@ -143,6 +143,21 @@ class DeletedTasksActivity : AppCompatActivity() {
             .setNegativeButton("Cancelar", null)
             .show()
     }
+
+    private fun deleteTaskPermanently(task: Task) {
+        if (!task.firebaseId.isNullOrEmpty()) {
+            firebaseService.permanentlyDeleteTask(task.firebaseId) { success, error ->
+                if (success) {
+                    deleteTaskFromLocal(task)
+                } else {
+                    showLocalDeleteDialog(task, error)
+                }
+            }
+        } else {
+            deleteTaskFromLocal(task)
+        }
+    }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
