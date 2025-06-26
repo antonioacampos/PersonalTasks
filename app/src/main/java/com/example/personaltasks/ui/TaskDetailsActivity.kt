@@ -29,4 +29,11 @@ class TaskDetailsActivity : AppCompatActivity() {
 
         loadTaskDetails()
     }
+
+    private fun initViews() {
+        titleTextView = findViewById(R.id.titleTextView)
+        descriptionTextView = findViewById(R.id.descriptionTextView)
+        dueDateTextView = findViewById(R.id.dueDateTextView)
+    }
+
 }
