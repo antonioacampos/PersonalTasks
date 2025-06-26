@@ -199,6 +199,16 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         loadTasksFromDatabase()
     }
 
+    private fun hasActiveFilters(): Boolean {
+        return currentSearchText != null || currentStartDate != null || currentEndDate != null
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatDate(date: LocalDate): String {
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        return date.format(formatter)
+    }
+
     private fun setupUi() {
         setSupportActionBar(binding.toolbar.toolbar)
         configureTaskList()
