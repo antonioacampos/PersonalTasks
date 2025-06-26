@@ -165,6 +165,12 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadTasksFromDatabase()
+    }
+
+
     override fun onRemoveTask(position: Int) {
         val taskToRemove = tasks[position]
 
