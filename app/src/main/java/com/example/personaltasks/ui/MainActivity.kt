@@ -74,8 +74,8 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                         }
                     }
                 }
-                loadTasksFromDatabase()
             }
+            loadTasksFromDatabase()
         }
     }
 
