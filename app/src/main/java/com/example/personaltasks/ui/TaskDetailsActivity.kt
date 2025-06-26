@@ -1,7 +1,11 @@
 package com.example.personaltasks.ui
 
+import android.os.Bundle
+import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.personaltasks.R
 import com.example.personaltasks.model.FirebaseTaskService
 import com.example.personaltasks.model.Task
 
@@ -66,6 +70,12 @@ class TaskDetailsActivity : AppCompatActivity() {
         descriptionTextView.text = description
         dueDateTextView.text = "Prazo: $dueDate"
     }
+
+    private fun formatDate(timestamp: Long): String {
+        val sdf = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+        return sdf.format(java.util.Date(timestamp))
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
