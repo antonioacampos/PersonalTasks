@@ -158,6 +158,19 @@ class DeletedTasksActivity : AppCompatActivity() {
         }
     }
 
+    private fun deleteTaskFromLocal(task: Task) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                taskController.removeTask(task)
+            }
+            loadDeletedTasks()
+            Toast.makeText(
+                this@DeletedTasksActivity,
+                "Tarefa \"${task.title}\" excluída definitivamente",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
