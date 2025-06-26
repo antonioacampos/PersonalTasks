@@ -19,6 +19,7 @@ import com.example.personaltasks.controllers.TaskController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.appcompat.app.AlertDialog
 
 class DeletedTasksActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
@@ -84,7 +85,7 @@ class DeletedTasksActivity : AppCompatActivity() {
                     return true
                 }
                 2 -> {
-                    showTaskDetails(task)
+                    showDeleteConfirmationDialog(task)
                     return true
                 }
                 else -> {
@@ -132,15 +133,16 @@ class DeletedTasksActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun showTaskDetails(task: Task) {
-        val intent = Intent(this, TaskDetailsActivity::class.java)
-        intent.putExtra("task_id", task.id)
-        intent.putExtra("task_title", task.title)
-        intent.putExtra("task_description", task.description)
-        intent.putExtra("task_due_date", task.dueDate)
-        intent.putExtra("is_deleted", true)
-        startActivity(intent)
+    private fun showDeleteConfirmationDialog(task: Task) {
+        AlertDialog.Builder(this)
+            .setTitle("Excluir Definitivamente")
+            .setMessage("Tem certeza que deseja excluir permanentemente a tarefa \"${task.title}\"?\n\nEsta ação não pode ser desfeita.")
+            .setPositiveButton("Excluir") { _, _ ->
+                deleteTaskPermanently(task)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

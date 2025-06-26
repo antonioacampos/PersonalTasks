@@ -28,7 +28,7 @@ class DeletedTasksAdapter(
         override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
             menu?.setHeaderTitle("Opções da Tarefa")
             menu?.add(0, 1, 0, "Reativar tarefa")
-            menu?.add(0, 2, 0, "Detalhes")
+            menu?.add(0, 2, 0, "Excluir definitivamente")
         }
     }
 
