@@ -1,10 +1,20 @@
 package com.example.personaltasks.ui
+
+import android.os.Bundle
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.personaltasks.R
 import com.example.personaltasks.adapter.DeletedTasksAdapter
 import com.example.personaltasks.model.FirebaseTaskService
 import com.example.personaltasks.model.Task
 import android.content.Intent
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.lifecycleScope
 import com.example.personaltasks.controllers.TaskController
 import kotlinx.coroutines.launch
 
@@ -49,6 +59,7 @@ class DeletedTasksActivity : AppCompatActivity() {
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onContextItemSelected(item: MenuItem): Boolean {
         selectedTask?.let { task ->
@@ -89,5 +100,15 @@ class DeletedTasksActivity : AppCompatActivity() {
         intent.putExtra("task_due_date", task.dueDate)
         intent.putExtra("is_deleted", true)
         startActivity(intent)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
