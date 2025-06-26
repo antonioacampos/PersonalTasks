@@ -16,4 +16,15 @@ class DeletedTasksAdapter(
             .inflate(R.layout.item_deleted_task, parent, false)
         return ViewHolder(view)
     }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val task = tasks[position]
+        holder.titleTextView.text = task.title
+        holder.descriptionTextView.text = task.description
+        holder.dueDateTextView.text = "Prazo: ${task.dueDate}"
+        holder.itemView.setOnLongClickListener {
+            onItemLongClick(task, position)
+            false
+        }
+    }
 }
