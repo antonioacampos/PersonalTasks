@@ -47,33 +47,36 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.let { data ->
-                lifecycleScope.launch {
-                    val task = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        data.getParcelableExtra(EXTRA_TASK, Task::class.java)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        data.getParcelableExtra(EXTRA_TASK)
-                    }
-                    val position = data.getIntExtra("TASK_POSITION", -1)
+                val task = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    data.getParcelableExtra(EXTRA_TASK, Task::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    data.getParcelableExtra(EXTRA_TASK)
+                }
+                val position = data.getIntExtra("TASK_POSITION", -1)
 
-                    task?.let { receivedTask ->
-                        if (position >= 0) {
-                            taskController.updateTask(receivedTask)
-                            updateTaskInList(receivedTask, position)
-                        } else {
+                task?.let { receivedTask ->
+                    lifecycleScope.launch {
+                        val localId = withContext(Dispatchers.IO) {
                             taskController.createTask(receivedTask)
-                            addTaskToList(receivedTask)
                         }
-                        loadTasksFromDatabase()
+                        val taskWithLocalId = receivedTask.copy(id = localId.toInt())
+                        firebaseService.saveTask(taskWithLocalId) { success, firebaseId ->
+                            val updatedTask = taskWithLocalId.copy(firebaseId = firebaseId ?: "")
+                            lifecycleScope.launch {
+                                taskController.updateTask(updatedTask)
+                                if (position >= 0) {
+                                    updateTaskInList(updatedTask, position)
+                                } else {
+                                    addTaskToList(updatedTask)
+                                }
+                            }
+                        }
                     }
                 }
+                loadTasksFromDatabase()
             }
         }
-    }
-
-    private val tasks = mutableListOf<Task>()
-    private val taskAdapter: TaskRvAdapter by lazy {
-        TaskRvAdapter(tasks, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
