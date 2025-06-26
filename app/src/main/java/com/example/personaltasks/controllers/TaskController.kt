@@ -38,6 +38,11 @@ class TaskController(
     }
 
     @WorkerThread
+    suspend fun getDeletedTasks(): List<Task> = withContext(dispatcher) {
+        taskDao.getDeletedTasks()
+    }
+
+    @WorkerThread
     suspend fun updateTask(task: Task): Int = withContext(dispatcher) {
         taskDao.update(task)
     }
