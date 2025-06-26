@@ -99,6 +99,41 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
 
         setupUi()
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setupSearchBar() {
+        binding.searchBar.searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                currentSearchText = s?.toString()?.takeIf { it.isNotBlank() }
+                performSearch()
+            }
+        })
+
+        binding.searchBar.startDateEditText.setOnClickListener {
+            showDatePicker { date ->
+                currentStartDate = date
+                binding.searchBar.startDateEditText.setText(formatDate(date))
+                performSearch()
+            }
+        }
+
+        binding.searchBar.endDateEditText.setOnClickListener {
+            showDatePicker { date ->
+                currentEndDate = date
+                binding.searchBar.endDateEditText.setText(formatDate(date))
+                performSearch()
+            }
+        }
+
+        binding.searchBar.searchButton.setOnClickListener {
+            performSearch()
+        }
+
+        binding.searchBar.clearFiltersButton.setOnClickListener {
+            clearFilters()
+        }
+    }
         loadTasksFromDatabase()
     }
 
