@@ -16,7 +16,9 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.example.personaltasks.controllers.TaskController
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DeletedTasksActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
@@ -54,10 +56,23 @@ class DeletedTasksActivity : AppCompatActivity() {
 
     private fun loadDeletedTasks() {
         lifecycleScope.launch {
-            val deletedTasks = taskController.getDeletedTasks()
-            adapter.updateTasks(deletedTasks)
+            val localDeletedTasks = withContext(Dispatchers.IO) {
+                taskController.getDeletedTasks()
+            }
+
+            if (localDeletedTasks.isNotEmpty()) {
+                adapter.updateTasks(localDeletedTasks)
+            } else {
+                firebaseService.getDeletedTasks { firebaseTasks ->
+                    runOnUiThread {
+                        adapter.updateTasks(firebaseTasks)
+                    }
+                }
+            }
         }
     }
+
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -80,13 +95,39 @@ class DeletedTasksActivity : AppCompatActivity() {
         return super.onContextItemSelected(item)
     }
 
-
     private fun reactivateTask(task: Task) {
+        if (task.firebaseId.isNullOrEmpty()) {
+            lifecycleScope.launch {
+                val reactivatedTask = task.copy(isDeleted = false)
+                taskController.updateTask(reactivatedTask)
+                loadDeletedTasks()
+                Toast.makeText(
+                    this@DeletedTasksActivity,
+                    "Tarefa reativada apenas localmente (sem sincronização)",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            return
+        }
+
         firebaseService.reactivateTask(task.firebaseId) { success, error ->
             if (success) {
-                Toast.makeText(this, "Tarefa reativada com sucesso", Toast.LENGTH_SHORT).show()
+                lifecycleScope.launch {
+                    val reactivatedTask = task.copy(isDeleted = false)
+                    taskController.updateTask(reactivatedTask)
+                    loadDeletedTasks()
+                    Toast.makeText(
+                        this@DeletedTasksActivity,
+                        "Tarefa reativada com sucesso!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             } else {
-                Toast.makeText(this, "Erro ao reativar tarefa: $error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@DeletedTasksActivity,
+                    "Erro ao reativar: $error",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
