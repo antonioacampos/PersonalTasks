@@ -9,6 +9,7 @@ import com.example.personaltasks.ui.MainActivity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 class TaskController(
     private val taskDao: TaskDAO,
@@ -62,5 +63,25 @@ class TaskController(
     @WorkerThread
     suspend fun removeAllTasks() = withContext(dispatcher) {
         taskDao.deleteAll()
+    }
+
+    suspend fun searchTasksByTitle(searchText: String): List<Task> = withContext(dispatcher) {
+        taskDao.searchTasksByTitle(searchText)
+    }
+
+    suspend fun getTasksByDate(date: LocalDate): List<Task> = withContext(dispatcher) {
+        taskDao.getTasksByDate(date.toString())
+    }
+
+    suspend fun getTasksByDateRange(startDate: LocalDate, endDate: LocalDate): List<Task> = withContext(dispatcher) {
+        taskDao.getTasksByDateRange(startDate.toString(), endDate.toString())
+    }
+
+    suspend fun searchTasks(searchText: String?, startDate: LocalDate?, endDate: LocalDate?): List<Task> = withContext(dispatcher) {
+        taskDao.searchTasks(
+            searchText?.takeIf { it.isNotBlank() },
+            startDate?.toString(),
+            endDate?.toString()
+        )
     }
 }
