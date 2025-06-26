@@ -1,15 +1,20 @@
 package com.example.personaltasks.ui
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import java.time.format.DateTimeFormatter
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.personaltasks.R
@@ -25,8 +30,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity(), OnTaskClickListener {
+
+    private var currentSearchText: String? = null
+    private var currentStartDate: LocalDate? = null
+    private var currentEndDate: LocalDate? = null
 
     private val taskController: TaskController by lazy {
         TaskController.getInstance(this)
@@ -87,7 +97,9 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
@@ -99,6 +111,10 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
 
         setupUi()
+        setupSearchBar()
+        loadTasksFromDatabase()
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setupSearchBar() {
         binding.searchBar.searchEditText.addTextChangedListener(object : TextWatcher {
@@ -170,6 +186,16 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
             Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun clearFilters() {
+        currentSearchText = null
+        currentStartDate = null
+        currentEndDate = null
+
+        binding.searchBar.searchEditText.setText("")
+        binding.searchBar.startDateEditText.setText("")
+        binding.searchBar.endDateEditText.setText("")
+
         loadTasksFromDatabase()
     }
 
