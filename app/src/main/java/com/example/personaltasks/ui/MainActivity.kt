@@ -158,17 +158,34 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     override fun onRemoveTask(position: Int) {
+        val taskToRemove = tasks[position]
+
         lifecycleScope.launch {
-            val taskToRemove = tasks[position]
-            taskController.removeTask(taskToRemove)
+            val updatedTask = taskToRemove.copy(isDeleted = true)
+            withContext(Dispatchers.IO) {
+                taskController.updateTask(updatedTask)
+            }
             tasks.removeAt(position)
             runOnUiThread {
                 taskAdapter.notifyItemRemoved(position)
                 Toast.makeText(
                     this@MainActivity,
-                    "${taskToRemove.title} removed!",
+                    "${taskToRemove.title} movida para excluídas!",
                     Toast.LENGTH_SHORT
                 ).show()
+            }
+            if (!taskToRemove.firebaseId.isNullOrEmpty()) {
+                firebaseService.deleteTask(taskToRemove.firebaseId) { success, error ->
+                    if (!success) {
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Erro ao excluir no Firebase: ${error ?: "Desconhecido"}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
             }
         }
     }
