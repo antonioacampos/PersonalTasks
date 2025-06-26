@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -61,19 +62,26 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                             taskController.createTask(receivedTask)
                         }
                         val taskWithLocalId = receivedTask.copy(id = localId.toInt())
+
                         firebaseService.saveTask(taskWithLocalId) { success, firebaseId ->
-                            val updatedTask = taskWithLocalId.copy(firebaseId = firebaseId ?: "")
-                            lifecycleScope.launch {
-                                taskController.updateTask(updatedTask)
-                                if (position >= 0) {
-                                    updateTaskInList(updatedTask, position)
-                                } else {
-                                    addTaskToList(updatedTask)
+                            if (success && firebaseId != null) {
+                                val updatedTask = taskWithLocalId.copy(firebaseId = firebaseId)
+
+                                lifecycleScope.launch {
+                                    taskController.updateTask(updatedTask)
+                                    if (position >= 0) {
+                                        updateTaskInList(updatedTask, position)
+                                    } else {
+                                        addTaskToList(updatedTask)
+                                    }
                                 }
+                            } else {
+                                Log.e("MainActivity", "Falha ao salvar no Firebase: $firebaseId")
                             }
                         }
                     }
                 }
+
             }
             loadTasksFromDatabase()
         }
