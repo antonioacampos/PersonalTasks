@@ -15,9 +15,12 @@ import com.example.personaltasks.R
 import com.example.personaltasks.adapter.TaskRvAdapter
 import com.example.personaltasks.controllers.TaskController
 import com.example.personaltasks.databinding.ActivityMainBinding
+import com.example.personaltasks.model.FirebaseTaskService
 import com.example.personaltasks.model.Task
 import com.example.personaltasks.ui.Extras.EXTRA_TASK
 import com.example.personaltasks.ui.Extras.EXTRA_VIEW_MODE
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -27,6 +30,8 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     private val taskController: TaskController by lazy {
         TaskController.getInstance(this)
     }
+
+    private val firebaseService = FirebaseTaskService()
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
