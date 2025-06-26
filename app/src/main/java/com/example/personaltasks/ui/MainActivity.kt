@@ -37,6 +37,11 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+    private val tasks = mutableListOf<Task>()
+    private val taskAdapter: TaskRvAdapter by lazy {
+        TaskRvAdapter(tasks, this)
+    }
+
     private val createTaskArl = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -126,7 +131,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
     private fun loadTasksFromDatabase() {
         lifecycleScope.launch {
-            val databaseTasks = taskController.getAllTasks()
+            val databaseTasks = withContext(Dispatchers.IO) { taskController.getAllTasks() }
             tasks.clear()
             tasks.addAll(databaseTasks)
             taskAdapter.notifyDataSetChanged()
@@ -169,7 +174,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         tasks[position] = task
         runOnUiThread {
             taskAdapter.notifyItemChanged(position)
-            Toast.makeText(this, "Task updated!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Tarefa atualizada!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -177,7 +182,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         tasks.add(task)
         runOnUiThread {
             taskAdapter.notifyItemInserted(tasks.lastIndex)
-            Toast.makeText(this, "Task added!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Tarefa adicionada!", Toast.LENGTH_SHORT).show()
         }
     }
 
