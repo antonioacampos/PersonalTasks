@@ -238,11 +238,17 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     private fun loadTasksFromDatabase() {
-        lifecycleScope.launch {
-            val databaseTasks = withContext(Dispatchers.IO) { taskController.getAllTasks() }
-            tasks.clear()
-            tasks.addAll(databaseTasks)
-            taskAdapter.notifyDataSetChanged()
+        if (hasActiveFilters()) {
+            performSearch()
+        } else {
+            lifecycleScope.launch {
+                val databaseTasks = withContext(Dispatchers.IO) {
+                    taskController.getAllTasks()
+                }
+                tasks.clear()
+                tasks.addAll(databaseTasks)
+                taskAdapter.notifyDataSetChanged()
+            }
         }
     }
 
