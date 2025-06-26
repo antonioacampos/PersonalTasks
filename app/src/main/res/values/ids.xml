@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="emailEditText" type="id" />
+    <item name="passwordEditText" type="id" />
+    <item name="loginButton" type="id" />
+    <item name="registerButton" type="id" />
+    <item name="titleTextView" type="id" />
+    <item name="descriptionTextView" type="id" />
+    <item name="dueDateTextView" type="id" />
+    <item name="recyclerViewDeletedTasks" type="id" />
+    <item name="action_logout" type="id" />
+    <item name="action_deleted_tasks" type="id" />
+</resources>
