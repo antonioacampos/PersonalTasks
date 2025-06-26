@@ -5,12 +5,16 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.personaltasks.databinding.ActivityTaskBinding
 import com.example.personaltasks.model.Task
 import com.example.personaltasks.ui.Extras.EXTRA_TASK
 import com.example.personaltasks.ui.Extras.EXTRA_VIEW_MODE
+import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDate
+import java.time.ZoneId
+import java.util.*
 
 class TasksActivity : AppCompatActivity() {
 
@@ -28,12 +32,13 @@ class TasksActivity : AppCompatActivity() {
 
         setupToolbar()
         handleIntent()
+        setupButtons()
     }
 
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbar.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.subtitle = "New task"
+        supportActionBar?.subtitle = "Nova tarefa"
     }
 
     private fun handleIntent() {
@@ -58,25 +63,27 @@ class TasksActivity : AppCompatActivity() {
     }
 
     private fun showTaskDetails(task: Task) {
-        supportActionBar?.subtitle = if (isEditMode) "Updating task" else "Task details"
+        supportActionBar?.subtitle = if (isEditMode) "Editando tarefa" else "Detalhes da tarefa"
 
         with(binding) {
             titleEt.setText(task.title)
             descriptionEt.setText(task.description)
-            dueDateDp.updateDate(task.dueDate.year, task.dueDate.monthValue - 1, task.dueDate.dayOfMonth)
+
+            val date = Date.from(task.dueDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+            val cal = Calendar.getInstance().apply { time = date }
+            dueDateDp.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
 
             val isViewMode = intent.getBooleanExtra(EXTRA_VIEW_MODE, false)
             listOf(titleEt, descriptionEt, dueDateDp).forEach { it.isEnabled = !isViewMode }
             saveBt.visibility = if (isViewMode) View.GONE else View.VISIBLE
         }
-
-        setupButtons()
     }
 
     private fun setupNewTask() {
-        supportActionBar?.subtitle = "New task"
+        supportActionBar?.subtitle = "Nova tarefa"
         binding.saveBt.visibility = View.VISIBLE
-        setupButtons()
+        val cal = Calendar.getInstance()
+        binding.dueDateDp.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
     }
 
     private fun setupButtons() {
@@ -101,6 +108,18 @@ class TasksActivity : AppCompatActivity() {
     }
 
     private fun createTaskFromInputs(): Task {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.YEAR, binding.dueDateDp.year)
+            set(Calendar.MONTH, binding.dueDateDp.month)
+            set(Calendar.DAY_OF_MONTH, binding.dueDateDp.dayOfMonth)
+        }
+
+        val dueDate = LocalDate.of(
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+
         return originalTask?.copy(
             title = binding.titleEt.text.toString(),
             description = binding.descriptionEt.text.toString(),
@@ -114,11 +133,8 @@ class TasksActivity : AppCompatActivity() {
             id = 0,
             title = binding.titleEt.text.toString(),
             description = binding.descriptionEt.text.toString(),
-            dueDate = LocalDate.of(
-                binding.dueDateDp.year,
-                binding.dueDateDp.month + 1,
-                binding.dueDateDp.dayOfMonth
-            ),
+            dueDate = dueDate,
+            userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
             isCompleted = false
         )
     }
@@ -128,6 +144,7 @@ class TasksActivity : AppCompatActivity() {
     }
 
     private fun showValidationError() {
+        Toast.makeText(this, "Preencha título e descrição!", Toast.LENGTH_SHORT).show()
     }
 
     private fun returnResult(task: Task) {
@@ -136,13 +153,13 @@ class TasksActivity : AppCompatActivity() {
             if (isEditMode) {
                 putExtra("TASK_POSITION", taskPosition)
             }
-            setResult(RESULT_OK, this)
+            setResult(Activity.RESULT_OK, this)
         }
         finish()
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        setResult(RESULT_CANCELED)
+        setResult(Activity.RESULT_CANCELED)
         finish()
         return true
     }
