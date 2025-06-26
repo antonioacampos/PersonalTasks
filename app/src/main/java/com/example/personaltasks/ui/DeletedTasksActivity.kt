@@ -80,4 +80,14 @@ class DeletedTasksActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun showTaskDetails(task: Task) {
+        val intent = Intent(this, TaskDetailsActivity::class.java)
+        intent.putExtra("task_id", task.id)
+        intent.putExtra("task_title", task.title)
+        intent.putExtra("task_description", task.description)
+        intent.putExtra("task_due_date", task.dueDate)
+        intent.putExtra("is_deleted", true)
+        startActivity(intent)
+    }
 }
