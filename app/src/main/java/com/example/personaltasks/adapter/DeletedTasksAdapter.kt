@@ -27,4 +27,12 @@ class DeletedTasksAdapter(
             false
         }
     }
+
+    override fun getItemCount(): Int = tasks.size
+
+    fun updateTasks(newTasks: List<Task>) {
+        tasks.clear()
+        tasks.addAll(newTasks)
+        notifyDataSetChanged()
+    }
 }
