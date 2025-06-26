@@ -66,4 +66,13 @@ class TaskDetailsActivity : AppCompatActivity() {
         descriptionTextView.text = description
         dueDateTextView.text = "Prazo: $dueDate"
     }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 }
