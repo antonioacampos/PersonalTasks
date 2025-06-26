@@ -150,6 +150,26 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         )
         datePickerDialog.show()
     }
+
+    private fun performSearch() {
+        lifecycleScope.launch {
+            val searchResults = withContext(Dispatchers.IO) {
+                taskController.searchTasks(currentSearchText, currentStartDate, currentEndDate)
+            }
+
+            tasks.clear()
+            tasks.addAll(searchResults)
+            taskAdapter.notifyDataSetChanged()
+
+            val resultCount = searchResults.size
+            val message = when {
+                hasActiveFilters() -> "Encontradas $resultCount tarefas"
+                else -> "Mostrando todas as tarefas ($resultCount)"
+            }
+
+            Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+        }
+    }
         loadTasksFromDatabase()
     }
 
