@@ -1,5 +1,17 @@
 package com.example.personaltasks.adapter
 
+import android.view.ContextMenu
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.personaltasks.R
+import com.example.personaltasks.model.Task
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 class DeletedTasksAdapter(
     private var tasks: MutableList<Task>,
     private val onItemLongClick: (Task, Int) -> Unit
@@ -34,5 +46,10 @@ class DeletedTasksAdapter(
         tasks.clear()
         tasks.addAll(newTasks)
         notifyDataSetChanged()
+    }
+
+    private fun formatDate(timestamp: Long): String {
+        val sdf = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+        return sdf.format(java.util.Date(timestamp))
     }
 }
