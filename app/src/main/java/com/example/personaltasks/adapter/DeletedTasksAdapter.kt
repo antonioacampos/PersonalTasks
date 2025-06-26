@@ -17,10 +17,19 @@ class DeletedTasksAdapter(
     private val onItemLongClick: (Task, Int) -> Unit
 ) : RecyclerView.Adapter<DeletedTasksAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
         val titleTextView: TextView = view.findViewById(R.id.titleTextView)
         val descriptionTextView: TextView = view.findViewById(R.id.descriptionTextView)
         val dueDateTextView: TextView = view.findViewById(R.id.dueDateTextView)
+
+        init {
+            view.setOnCreateContextMenuListener(this)
+        }
+        override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+            menu?.setHeaderTitle("Opções da Tarefa")
+            menu?.add(0, 1, 0, "Reativar tarefa")
+            menu?.add(0, 2, 0, "Detalhes")
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
