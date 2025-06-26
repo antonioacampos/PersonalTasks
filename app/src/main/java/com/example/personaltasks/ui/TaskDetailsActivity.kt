@@ -36,4 +36,19 @@ class TaskDetailsActivity : AppCompatActivity() {
         dueDateTextView = findViewById(R.id.dueDateTextView)
     }
 
+    private fun loadTaskDetails() {
+        taskId?.let { id ->
+            firebaseService.getTaskById(id) { task ->
+                task?.let {
+                    displayTaskDetails(it)
+                } ?: run {
+                    Toast.makeText(this, "Erro ao carregar detalhes da tarefa", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
+        } ?: run {
+            displayTaskFromIntent()
+        }
+    }
+
 }
