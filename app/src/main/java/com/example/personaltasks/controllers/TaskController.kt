@@ -15,10 +15,17 @@ class TaskController(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     companion object {
-        fun getInstance(mainActivity: MainActivity): TaskController {
-            val context = mainActivity.applicationContext
-            val database = TaskRoomDatabase.getDatabase(context)
-            return TaskController(database.taskDao())
+        @Volatile
+        private var instance: TaskController? = null
+
+        fun getInstance(context: Context): TaskController {
+            return instance ?: synchronized(this) {
+                val database = TaskRoomDatabase.getDatabase(context.applicationContext)
+                val dao = database.taskDao()
+                val newInstance = TaskController(dao)
+                instance = newInstance
+                newInstance
+            }
         }
     }
 
