@@ -171,6 +171,16 @@ class DeletedTasksActivity : AppCompatActivity() {
             ).show()
         }
     }
+
+    private fun showLocalDeleteDialog(task: Task, error: String?) {
+        AlertDialog.Builder(this)
+            .setTitle("Erro no Firebase")
+            .setMessage("Não foi possível excluir do Firebase: $error\n\nDeseja excluir apenas localmente?")
+            .setPositiveButton("Sim") { _, _ ->
+                deleteTaskFromLocal(task)
+            }
+            .setNegativeButton("Não", null)
+            .show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
