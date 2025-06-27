@@ -114,6 +114,21 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         setupSearchBar()
         loadTasksFromDatabase()
     }
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun showTodayTasks() {
+        lifecycleScope.launch {
+            val todayTasks = withContext(Dispatchers.IO) { taskController.getTodayTasks() }
+            if (todayTasks.isNotEmpty()) {
+                tasks.clear()
+                tasks.addAll(todayTasks)
+                taskAdapter.notifyDataSetChanged()
+                Toast.makeText(this@MainActivity, "Mostrando ${todayTasks.size} tarefas de hoje", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@MainActivity, "Nenhuma tarefa para hoje!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setupSearchBar() {
