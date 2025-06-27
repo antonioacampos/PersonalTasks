@@ -94,5 +94,29 @@ class TaskController private constructor(private val taskDao: TaskDAO) {
     suspend fun getTotalTasksCount(): Int = withContext(dispatcher) {
         taskDao.getTotalTasksCount(getCurrentUserId())
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getOverdueTasks(): List<Task> = withContext(dispatcher) {
+        val today = LocalDate.now().toString()
+        taskDao.getOverdueTasks(today, getCurrentUserId())
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getOverdueTasksCount(): Int = withContext(dispatcher) {
+        val today = LocalDate.now().toString()
+        taskDao.getOverdueTasksCount(today, getCurrentUserId())
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getTodayTasks(): List<Task> = withContext(dispatcher) {
+        val today = LocalDate.now().toString()
+        taskDao.getTodayTasks(today, getCurrentUserId())
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getTodayTasksCount(): Int = withContext(dispatcher) {
+        val today = LocalDate.now().toString()
+        taskDao.getTodayTasksCount(today, getCurrentUserId())
+    }
 }
 
