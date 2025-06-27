@@ -56,4 +56,17 @@ interface TaskDAO {
 
     @Query("DELETE FROM Task WHERE id = :taskId AND userId = :userId")
     suspend fun deleteById(taskId: Int, userId: String)
+
+    @Query("SELECT COUNT(*) FROM Task WHERE isDeleted = 0 AND isCompleted = 0 AND userId = :userId")
+    suspend fun getActiveTasksCount(userId: String): Int
+
+    @Query("SELECT COUNT(*) FROM Task WHERE isDeleted = 0 AND isCompleted = 1 AND userId = :userId")
+    suspend fun getCompletedTasksCount(userId: String): Int
+
+    @Query("SELECT COUNT(*) FROM Task WHERE isDeleted = 1 AND userId = :userId")
+    suspend fun getDeletedTasksCount(userId: String): Int
+
+    @Query("SELECT COUNT(*) FROM Task WHERE userId = :userId")
+    suspend fun getTotalTasksCount(userId: String): Int
+
 }
