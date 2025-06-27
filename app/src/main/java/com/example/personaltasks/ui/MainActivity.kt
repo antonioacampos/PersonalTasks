@@ -115,6 +115,21 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         loadTasksFromDatabase()
     }
     @RequiresApi(Build.VERSION_CODES.O)
+    private fun showOverdueTasks() {
+        lifecycleScope.launch {
+            val overdueTasks = withContext(Dispatchers.IO) { taskController.getOverdueTasks() }
+            if (overdueTasks.isNotEmpty()) {
+                tasks.clear()
+                tasks.addAll(overdueTasks)
+                taskAdapter.notifyDataSetChanged()
+                Toast.makeText(this@MainActivity, "Mostrando ${overdueTasks.size} tarefas atrasadas", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@MainActivity, "Nenhuma tarefa atrasada!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun showTodayTasks() {
         lifecycleScope.launch {
             val todayTasks = withContext(Dispatchers.IO) { taskController.getTodayTasks() }
