@@ -11,6 +11,7 @@ import com.example.personaltasks.model.Task
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import com.example.personaltasks.ui.OnTaskClickListener
+import com.example.personaltasks.model.Priority
 
 class TaskRvAdapter(
     private val tasks: List<Task>,
@@ -24,6 +25,7 @@ class TaskRvAdapter(
             with(binding) {
                 titleTv.text = task.title
                 descriptionTv.text = task.description
+
                 dueDateTv.text = task.dueDate.format(
                     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                 )
@@ -34,7 +36,20 @@ class TaskRvAdapter(
                 }
                 titleTv.setTextColor(textColor)
                 descriptionTv.setTextColor(textColor)
+                when(task.priority){
+                    Priority.HIGH -> {
+                        priorityTv.text = "Alta"
+                    }
 
+                    Priority.LOW -> {
+                        priorityTv.text = "Baixa"
+
+                    }
+                    Priority.MEDIUM -> {
+                        priorityTv.text = "Média"
+
+                    }
+                }
                 dueDateTv.setTextColor(textColor)
                 root.setOnClickListener {
                     onTaskClickListener.onViewTask(adapterPosition)

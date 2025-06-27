@@ -5,9 +5,11 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.personaltasks.databinding.ActivityTaskBinding
+import com.example.personaltasks.model.Priority
 import com.example.personaltasks.model.Task
 import com.example.personaltasks.ui.Extras.EXTRA_TASK
 import com.example.personaltasks.ui.Extras.EXTRA_VIEW_MODE
@@ -29,7 +31,10 @@ class TasksActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        val priorities = Priority.values()
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, priorities)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.prioritySpinner.adapter = adapter
         setupToolbar()
         handleIntent()
         setupButtons()
@@ -68,11 +73,10 @@ class TasksActivity : AppCompatActivity() {
         with(binding) {
             titleEt.setText(task.title)
             descriptionEt.setText(task.description)
-
             val date = Date.from(task.dueDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
             val cal = Calendar.getInstance().apply { time = date }
             dueDateDp.updateDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
-
+            prioritySpinner.selectedItem
             val isViewMode = intent.getBooleanExtra(EXTRA_VIEW_MODE, false)
             listOf(titleEt, descriptionEt, dueDateDp).forEach { it.isEnabled = !isViewMode }
             saveBt.visibility = if (isViewMode) View.GONE else View.VISIBLE
@@ -132,6 +136,7 @@ class TasksActivity : AppCompatActivity() {
         ) ?: Task(
             id = 0,
             title = binding.titleEt.text.toString(),
+            //priority = binding.prioritySpinner.selectedItem(getSelectedItem())
             description = binding.descriptionEt.text.toString(),
             dueDate = dueDate,
             userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",

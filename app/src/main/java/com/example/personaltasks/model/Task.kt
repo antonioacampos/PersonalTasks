@@ -17,6 +17,7 @@ data class Task(
     val isCompleted: Boolean = false,
     val isDeleted: Boolean = false,
     val userId: String = "",
+    val priority: Priority = Priority.MEDIUM,
     val deletedAt: Long = 0L,
     val createdAt: Long = System.currentTimeMillis()) : Parcelable {
 }

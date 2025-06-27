@@ -3,4 +3,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="completed_task_text">#4CAF50</color>
+    <color name="prority_high">#FF5252</color>
 </resources>

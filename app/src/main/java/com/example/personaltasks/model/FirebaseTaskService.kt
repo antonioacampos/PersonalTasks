@@ -13,7 +13,7 @@ class FirebaseTaskService {
     }
 
     fun saveTask(task: Task, onComplete: (Boolean, String?) -> Unit) {
-        val taskWithUserId = task.copy(userId = getCurrentUserId())
+        val taskWithUserId = task.copy(userId = getCurrentUserId(), priority = task.priority)
 
         if (task.firebaseId.isEmpty()) {
             db.collection("tasks")

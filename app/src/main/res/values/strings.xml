@@ -2,7 +2,7 @@
     <string name="app_name">personalTasks</string>
     <string name="new_task">New task</string>
     <string name="description">Description</string>
-    <string name="title">title</string>
+    <string name="title">Title</string>
     <string name="due_date">Due date</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
