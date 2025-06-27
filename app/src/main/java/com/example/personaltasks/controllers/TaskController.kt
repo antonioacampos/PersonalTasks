@@ -1,6 +1,8 @@
 package com.example.personaltasks.controllers
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.personaltasks.model.Task
 import com.example.personaltasks.model.TaskDAO
 import com.example.personaltasks.model.TaskRoomDatabase
@@ -75,6 +77,22 @@ class TaskController private constructor(private val taskDao: TaskDAO) {
                 newInstance
             }
         }
+    }
+
+    suspend fun getActiveTasksCount(): Int = withContext(dispatcher) {
+        taskDao.getActiveTasksCount(getCurrentUserId())
+    }
+
+    suspend fun getCompletedTasksCount(): Int = withContext(dispatcher) {
+        taskDao.getCompletedTasksCount(getCurrentUserId())
+    }
+
+    suspend fun getDeletedTasksCount(): Int = withContext(dispatcher) {
+        taskDao.getDeletedTasksCount(getCurrentUserId())
+    }
+
+    suspend fun getTotalTasksCount(): Int = withContext(dispatcher) {
+        taskDao.getTotalTasksCount(getCurrentUserId())
     }
 }
 
