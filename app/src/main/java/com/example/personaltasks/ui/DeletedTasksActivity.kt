@@ -63,18 +63,17 @@ class DeletedTasksActivity : AppCompatActivity() {
 
             if (localDeletedTasks.isNotEmpty()) {
                 adapter.updateTasks(localDeletedTasks)
+                Log.d("DeletedTasks", "Carregadas ${localDeletedTasks.size} tarefas do banco local")
             } else {
                 firebaseService.getDeletedTasks { firebaseTasks ->
                     runOnUiThread {
                         adapter.updateTasks(firebaseTasks)
+                        Log.d("DeletedTasks", "Carregadas ${firebaseTasks.size} tarefas do Firebase")
                     }
                 }
             }
         }
     }
-
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -97,16 +96,29 @@ class DeletedTasksActivity : AppCompatActivity() {
     }
 
     private fun reactivateTask(task: Task) {
+        Log.d("DeletedTasks", "Tentando reativar tarefa: ${task.title}, firebaseId: '${task.firebaseId}'")
+
         if (task.firebaseId.isNullOrEmpty()) {
             lifecycleScope.launch {
-                val reactivatedTask = task.copy(isDeleted = false)
-                taskController.updateTask(reactivatedTask)
-                loadDeletedTasks()
-                Toast.makeText(
-                    this@DeletedTasksActivity,
-                    "Tarefa reativada apenas localmente (sem sincronização)",
-                    Toast.LENGTH_LONG
-                ).show()
+                try {
+                    val reactivatedTask = task.copy(isDeleted = false)
+                    withContext(Dispatchers.IO) {
+                        taskController.updateTask(reactivatedTask)
+                    }
+                    loadDeletedTasks()
+                    setResult(RESULT_OK)
+                    Toast.makeText(
+                        this@DeletedTasksActivity,
+                        "Tarefa reativada apenas localmente (sem sincronização)",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this@DeletedTasksActivity,
+                        "Erro ao reativar tarefa: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
             return
         }
@@ -114,19 +126,30 @@ class DeletedTasksActivity : AppCompatActivity() {
         firebaseService.reactivateTask(task.firebaseId) { success, error ->
             if (success) {
                 lifecycleScope.launch {
-                    val reactivatedTask = task.copy(isDeleted = false)
-                    taskController.updateTask(reactivatedTask)
-                    loadDeletedTasks()
-                    Toast.makeText(
-                        this@DeletedTasksActivity,
-                        "Tarefa reativada com sucesso!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    try {
+                        val reactivatedTask = task.copy(isDeleted = false)
+                        withContext(Dispatchers.IO) {
+                            taskController.updateTask(reactivatedTask)
+                        }
+                        loadDeletedTasks()
+                        setResult(RESULT_OK)
+                        Toast.makeText(
+                            this@DeletedTasksActivity,
+                            "Tarefa reativada com sucesso!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            this@DeletedTasksActivity,
+                            "Erro ao atualizar tarefa localmente: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             } else {
                 Toast.makeText(
                     this@DeletedTasksActivity,
-                    "Erro ao reativar: $error",
+                    "Erro ao reativar no Firebase: $error",
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -160,15 +183,23 @@ class DeletedTasksActivity : AppCompatActivity() {
 
     private fun deleteTaskFromLocal(task: Task) {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                taskController.removeTask(task)
+            try {
+                withContext(Dispatchers.IO) {
+                    taskController.permanentlyDeleteTask(task.id)
+                }
+                loadDeletedTasks()
+                Toast.makeText(
+                    this@DeletedTasksActivity,
+                    "Tarefa \"${task.title}\" excluída definitivamente",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@DeletedTasksActivity,
+                    "Erro ao excluir tarefa: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-            loadDeletedTasks()
-            Toast.makeText(
-                this@DeletedTasksActivity,
-                "Tarefa \"${task.title}\" excluída definitivamente",
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
 
@@ -191,5 +222,10 @@ class DeletedTasksActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        selectedTask = null
     }
 }
