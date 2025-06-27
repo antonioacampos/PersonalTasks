@@ -331,6 +331,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
             taskAdapter.notifyItemInserted(tasks.lastIndex)
             Toast.makeText(this, "Tarefa adicionada!", Toast.LENGTH_SHORT).show()
         }
+        loadTasksFromDatabase()
     }
 
     companion object {
