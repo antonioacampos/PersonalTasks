@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         TaskRvAdapter(tasks, this)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private val createTaskArl = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -94,6 +95,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
             }
             loadTasksFromDatabase()
+            updateDashboard()
         }
     }
 
@@ -109,10 +111,47 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
             finish()
             return
         }
-
         setupUi()
         setupSearchBar()
+        setupDashboard()
         loadTasksFromDatabase()
+        updateDashboard()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setupDashboard() {
+        binding.dashboard.overdueTasksContainer.setOnClickListener {
+            showOverdueTasks()
+        }
+
+        binding.dashboard.todayTasksContainer.setOnClickListener {
+            showTodayTasks()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateDashboard() {
+        lifecycleScope.launch {
+            val activeCount = withContext(Dispatchers.IO) { taskController.getActiveTasksCount() }
+            val completedCount = withContext(Dispatchers.IO) { taskController.getCompletedTasksCount() }
+            val overdueCount = withContext(Dispatchers.IO) { taskController.getOverdueTasksCount() }
+            val todayCount = withContext(Dispatchers.IO) { taskController.getTodayTasksCount() }
+            val totalCount = activeCount + completedCount
+
+            binding.dashboard.activeTasksCount.text = activeCount.toString()
+            binding.dashboard.completedTasksCount.text = completedCount.toString()
+            binding.dashboard.overdueTasksCount.text = overdueCount.toString()
+            binding.dashboard.todayTasksCount.text = todayCount.toString()
+
+            val progress = if (totalCount > 0) {
+                (completedCount * 100) / totalCount
+            } else {
+                0
+            }
+
+            binding.dashboard.progressBar.progress = progress
+            binding.dashboard.progressText.text = "Progresso: $progress% ($completedCount de $totalCount tarefas)"
+        }
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun showOverdueTasks() {
@@ -217,6 +256,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun clearFilters() {
         currentSearchText = null
         currentStartDate = null
@@ -257,6 +297,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         return true
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.add_task_mi -> {
@@ -277,6 +318,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun loadTasksFromDatabase() {
         if (hasActiveFilters()) {
             performSearch()
@@ -290,6 +332,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                 taskAdapter.notifyDataSetChanged()
             }
         }
+        updateDashboard()
     }
 
     override fun onViewTask(position: Int) {
@@ -300,6 +343,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onEditTask(position: Int) {
         Intent(this, TasksActivity::class.java).apply {
             putExtra(EXTRA_TASK, tasks[position])
@@ -308,12 +352,15 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
         loadTasksFromDatabase()
+        updateDashboard()
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onRemoveTask(position: Int) {
         val taskToRemove = tasks[position]
 
@@ -345,6 +392,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                 }
             }
         }
+        updateDashboard()
     }
 
     private fun updateTaskInList(task: Task, position: Int) {
@@ -355,6 +403,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun addTaskToList(task: Task) {
         tasks.add(task)
         runOnUiThread {
